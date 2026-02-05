@@ -1,22 +1,22 @@
 # Setup
 
-This course will be run on RStudio (Posit) cloud. This is so all required packages and software versions are pre-installed. There will be a small installation step that will take about 5 minutes. To see instructions for setup on posit cloud, see [setup-cloud](setup-cloud.md)
+This workshop is run on RStudio (Posit) cloud. This is so all required packages and software versions are pre-installed. There will be a small installation step that will take about 5 minutes. To see instructions for setup on posit cloud, see [setup-cloud](setup-cloud.md)
 
 ## Installing `greta` on your machine
 
 From scratch, installing `greta` should look like the following:
 
 ```r
-# if you haven't installed the remotes package already
+# if you haven't installed the pak package already
 # this is a package that helps you install packages from 
 # github onto your machine
-# install.packages("remotes")
+# install.packages("pak")
 ```
 
 Then, install the development version of greta for this course
 
 ```r
-remotes::install_github("njtierney/greta@tf2-gc")
+pak::pak("greta-dev/greta")
 ```
 
 Then, load greta:
@@ -59,7 +59,7 @@ This should give you a happy message like:
 
 ```
 > greta_sitrep()
-✔ python (v3.9) available     
+✔ python (v3.11) available     (this could be 3.9-3.11)
 ✔ TensorFlow Probability (v0.23.0) available  
 2024-02-01 23:39:04.425108: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
 2024-02-01 23:39:04.425223: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
@@ -83,7 +83,25 @@ plot(draws)
 
 If you get some output that looks [like the output here](https://gist.github.com/njtierney/5c0e7d9f8be79cb30c7131e0d2cfbdfb)
 
-Then you are good to go!
+Then you are good to go with using greta
+
+## Other packages requires
+
+To do this workshop, we recommend the following packages are installed. These are automatically installed on the posit cloud.
+
+```r
+library(pak)
+pak(
+  c(
+    "tidyverse",
+    "palmerpenguins",
+    "coda",
+    "bayesplot",
+    "stats",
+    "DiagrammeR"
+  )
+)
+```
 
 ## Installation details
 
