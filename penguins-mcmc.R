@@ -77,7 +77,7 @@ draws <- mcmc(
 )
 
 # visualise the MCMC traces with {coda}
-plot(draws)
+plot(draws[, "coef_flipper_length"])
 
 # we can also use bayesplot to explore the convergence of the model
 bayesplot::mcmc_trace(draws)

@@ -1,4 +1,6 @@
+# this will rerun the previous step
 source("penguins-mcmc.R")
+source("R/penguins_add_simulation.R")
 # predict to a new dataset - first the marginal effect of body mass on the link
 # scale
 
@@ -15,13 +17,22 @@ penguins_for_prediction <- expand_grid(
   )
 )
 
+## note that this is creating a grid of values - we are going across the
+## range of body mass and flipper length
+expand_grid(
+  x = 1:3,
+  y = 1:3
+)
+
 penguins_for_prediction
 
+# create a new linear predictor using these new "data"
 # predict to these data
 eta_pred <- intercept +
   coef_flipper_length * penguins_for_prediction$flipper_length_mm_scaled +
   coef_body_mass * penguins_for_prediction$body_mass_g_scaled
 
+# create the link
 probability_female_pred <- ilogit(eta_pred)
 
 # compute posterior prediction simulations
@@ -39,25 +50,12 @@ sims <- calculate(
   nsim = n_sims
 )
 
-dim(sims$probability_female_pred)
+# we then add these simulations back to the data with a helper function,
+# `penguins_add_simulation`
 
-sims_wide <- sims$probability_female_pred[,, 1] |>
-  t() |>
-  as_tibble(.name_repair = "unique_quiet") |>
-  set_names(paste0("sim_", seq_len(n_sims)))
-
-sims_wide
-
-penguin_sims <- bind_cols(penguins_for_prediction, sims_wide)
-
-penguin_sims
-
-penguins_prediction <- pivot_longer(
-  penguin_sims,
-  cols = starts_with("sim"),
-  names_to = "sim",
-  values_to = "probability_female",
-  names_prefix = "sim_"
+penguins_prediction <- penguins_add_simulation(
+  sims = sims,
+  penguins_for_prediction = penguins_for_prediction
 )
 
 penguins_prediction
@@ -73,6 +71,8 @@ penguins_prediction_body_mass_conditional <- penguins_prediction |>
     abs(flipper_length_mm_scaled) == min(abs(flipper_length_mm_scaled))
   )
 
+# grouping by body mass is going conditional on body mass here - so for each
+# body mass value
 penguins_prediction_body_mass_conditional_summary <- penguins_prediction_body_mass_conditional |>
   group_by(
     body_mass_g_scaled

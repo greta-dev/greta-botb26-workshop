@@ -73,6 +73,8 @@ ppc_stat_grouped(
   binwidth = 0.005
 )
 
+## we didn't have an island effect in our model, so it makes sense that this isn't very good.
+
 # there are other uses of PPC
 # see
 # https://cran.r-project.org/web/packages/bayesplot/vignettes/graphical-ppcs.html
@@ -110,6 +112,3 @@ hist(sims_params_prior$coef_flipper_length)
 hist(sims_params_prior$coef_body_mass)
 hist(sims_params_prior$`eta[1, ]`)
 hist(sims_params_prior$`probability_female[1, ]`)
-
-# your turn: how to visualise your posterior samples
-###
