@@ -18,17 +18,6 @@ By the end of this 1-hour course, participants will be able to:
 4. **Check model convergence**: Interpret trace plots and R-hat values to assess whether the model has converged
 5. **Extract and interpret results**: Summarise posterior distributions and understand what they mean for your data
 
-## What's NOT Covered (but was in the full course)
-
-- Generalised linear models (logistic, Poisson, etc.)
-- Hierarchical/mixed effects models
-- Mixture models
-- Prior and posterior predictive checks
-- Model comparison and selection
-- Advanced diagnostics
-- Publication-ready visualisations
-- Custom models for specific research problems
-
 ## Target Audience
 
 Researchers and analysts who want a quick, practical introduction to get started with Bayesian modelling, with the understanding that additional self-study will be needed for more complex applications.
@@ -42,10 +31,6 @@ use_course("https://github.com/njtierney/greta-course-notes/archive/refs/heads/m
 ```
 
 Alternatively you can download the repository details by forking the repo, or pasting the above URL into the address bar of a browser.
-
-## Schedule
-
-The course will be delivered in person, see the [schedule](schedule.md) for more information.
 
 ## Setup & Installation
 

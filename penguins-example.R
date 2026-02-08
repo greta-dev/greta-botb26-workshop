@@ -15,18 +15,15 @@ head(penguins)
 # https://github.com/allisonhorst/palmerpenguins#artwork
 
 # before we can fit a model, we need to tidy up the data and transform some variables
-penguins_for_modelling <- penguins %>%
+penguins_for_modelling <- penguins |>
   # remove missing value records
-  drop_na() %>%
+  drop_na() |>
   # rescale the length and mass variables to make the coefficient priors easier
   # to define
   mutate(
     across(
-      c(bill_length_mm,
-        bill_depth_mm,
-        flipper_length_mm,
-        body_mass_g),
-      .fns = list(scaled = ~scale(.x))
+      c(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g),
+      .fns = list(scaled = \(x) scale(x))
     ),
     # code the sex as per a Bernoulli distribution
     is_female_numeric = if_else(sex == "female", 1, 0),
@@ -35,9 +32,9 @@ penguins_for_modelling <- penguins %>%
 
 # an aside - if you haven't seen `across` before, here is what it is
 # equivalent to:
-#  penguins %>%
+#  penguins |>
 #    # remove missing value records
-#    drop_na() %>%
+#    drop_na() |>
 #    # rescale the length and mass variables to make the coefficient priors easier
 #    # to define
 #    mutate(
@@ -91,6 +88,7 @@ distribution(y) <- bernoulli(probability_female)
 # combine into a model object
 m <- model(intercept, coef_flipper_length, coef_body_mass)
 
+# Show the dag - there's a couple of extra things here.
 plot(m)
 
 # do MCMC - 4 chains, 1000 on each after 1000 warmuup (the default)
@@ -149,20 +147,28 @@ sims <- calculate(
   nsim = n_sims
 )
 
-penguins_prediction <- sims$probability_female_pred[, , 1] %>%
-  t() %>%
-  as_tibble(.name_repair = "unique") %>%
-  set_names(paste0("sim_", seq_len(n_sims))) %>%
-  bind_cols(
-    penguins_for_prediction,
-    .
-  ) %>%
-  pivot_longer(
-    cols = starts_with("sim"),
-    names_to = "sim",
-    values_to = "probability_female",
-    names_prefix = "sim_"
-  )
+dim(sims$probability_female_pred)
+
+sims_wide <- sims$probability_female_pred[,, 1] |>
+  t() |>
+  as_tibble(.name_repair = "unique_quiet") |>
+  set_names(paste0("sim_", seq_len(n_sims)))
+
+sims_wide
+
+penguin_sims <- bind_cols(penguins_for_prediction, sims_wide)
+
+penguin_sims
+
+penguins_prediction <- pivot_longer(
+  penguin_sims,
+  cols = starts_with("sim"),
+  names_to = "sim",
+  values_to = "probability_female",
+  names_prefix = "sim_"
+)
+
+penguins_prediction
 
 # plot the conditional effect of bodymass, for the mean flipper length
 # recall: the mean flipper length has been scaled to have mean of 0 and SD of 1
@@ -170,22 +176,22 @@ penguins_prediction <- sims$probability_female_pred[, , 1] %>%
 # so although we want to say "filter to the mean value, which is zero", we
 # instead say: "filter to the mean value, which is the smallest absolute value"
 # which will be very close to zero.
-penguins_prediction_body_mass_conditional <- penguins_prediction %>%
+penguins_prediction_body_mass_conditional <- penguins_prediction |>
   filter(
     abs(flipper_length_mm_scaled) == min(abs(flipper_length_mm_scaled))
   )
 
-penguins_prediction_body_mass_conditional_summary <- penguins_prediction_body_mass_conditional %>%
+penguins_prediction_body_mass_conditional_summary <- penguins_prediction_body_mass_conditional |>
   group_by(
     body_mass_g_scaled
-  ) %>%
+  ) |>
   summarise(
     probability_female_mean = mean(probability_female),
     probability_female_upper = quantile(probability_female, 0.975),
     probability_female_lower = quantile(probability_female, 0.025),
   )
 
-penguins_prediction_body_mass_conditional_summary %>%
+penguins_prediction_body_mass_conditional_summary |>
   ggplot(
     aes(
       x = body_mass_g_scaled
@@ -267,7 +273,7 @@ str(y)
 # and the columns are the number of observations
 # this object is actually a 3 dimensional array.
 # We want to keep everything in the first two
-yrep_matrix <- sims_model$y[ , ,1]
+yrep_matrix <- sims_model$y[,, 1]
 y_values <- as.integer(y)
 
 ## distribution of test statistics
@@ -281,22 +287,20 @@ prop_ones <- function(x) mean(x == 1)
 prop_ones(y_values) # check proportion of ones in y
 
 # We can visualise the proportion of ones in the simulations from the model
-ppc_stat(y_values,
-         yrep_matrix,
-         stat = "prop_ones",
-         binwidth = 0.005)
+ppc_stat(y_values, yrep_matrix, stat = "prop_ones", binwidth = 0.005)
 
 # we can split this by grouping variables to look for things missing from our model
-ppc_stat_grouped(y_values,
-                 yrep_matrix,
-                 stat = "prop_ones",
-                 penguins_for_modelling$island,
-                 binwidth = 0.005)
+ppc_stat_grouped(
+  y_values,
+  yrep_matrix,
+  stat = "prop_ones",
+  penguins_for_modelling$island,
+  binwidth = 0.005
+)
 
 # there are other uses of PPC
 # see
 # https://cran.r-project.org/web/packages/bayesplot/vignettes/graphical-ppcs.html
-
 
 ###
 # we can also do *Prior* predictive checks
@@ -305,13 +309,10 @@ sims_prior <- calculate(
   nsim = 500
 )
 
-yrep_prior_matrix <- sims_prior$y[,,1]
+yrep_prior_matrix <- sims_prior$y[,, 1]
 
 # We can visualise the proportion of ones in the simulations from the model
-ppc_stat(y_values,
-         yrep_prior_matrix,
-         stat = "prop_ones",
-         binwidth = 0.005)
+ppc_stat(y_values, yrep_prior_matrix, stat = "prop_ones", binwidth = 0.005)
 
 # there are other uses of PPC
 
@@ -322,9 +323,9 @@ sims_params_prior <- calculate(
   coef_flipper_length,
   coef_body_mass,
   # estimate of first observation on link scale
-  eta[1,],
+  eta[1, ],
   # estimate of probability for first observation
-  probability_female[1,],
+  probability_female[1, ],
   nsim = 500
 )
 
@@ -337,4 +338,3 @@ hist(sims_params_prior$`probability_female[1, ]`)
 
 # your turn: how to visualise your posterior samples
 ###
-
