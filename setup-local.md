@@ -85,7 +85,7 @@ If you get some output that looks [like the output here](https://gist.github.com
 
 Then you are good to go with using greta
 
-## Other packages requires
+## Other packages requirements
 
 To do this workshop, we recommend the following packages are installed. These are automatically installed on the posit cloud.
 

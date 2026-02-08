@@ -1,16 +1,16 @@
-## Course Title
-**Getting Started with Bayesian Modelling in greta: A Practical Introduction**
+## Getting Started with Bayesian Modelling in greta: A Practical Introduction
 
 ## Abstract
+
 This intensive one-hour workshop provides a practical introduction to Bayesian modelling using the greta R package. Participants will learn the essential workflow for fitting Bayesian models, from model specification through to basic inference. We'll work through a simple linear regression example on real ecological data, demonstrating how to specify priors, fit models using MCMC, assess convergence, and interpret results. This course is designed for those with familiarity in R and linear models who want to quickly get started with Bayesian analysis in greta. By the end of the session, you'll have the foundational skills needed to fit basic Bayesian models and know where to go to learn more advanced techniques.
 
 ## Prerequisites
+
 - Familiarity with R and RStudio
 - Experience fitting linear models (lm/glm)
 - Basic awareness of Bayesian concepts (priors, posteriors)
 
 ## Key Learning Objectives
-By the end of this 1-hour course, participants will be able to:
 
 1. **Understand greta's core workflow**: Recognise the key steps in a greta analysis pipeline
 2. **Specify a simple Bayesian linear model**: Define variables, set priors, and construct a model object
@@ -27,7 +27,7 @@ Researchers and analysts who want a quick, practical introduction to get started
 If you plan on following along locally on your machine instead of on posit cloud, you can download the course materials by copying this link and running it inside an RStudio session:
 
 ```r
-use_course("https://github.com/njtierney/greta-course-notes/archive/refs/heads/master.zip")
+use_course("https://github.com/greta-dev/greta-botb26-workshop/archive/refs/heads/main.zip")
 ```
 
 Alternatively you can download the repository details by forking the repo, or pasting the above URL into the address bar of a browser.
@@ -38,3 +38,21 @@ For instructions on installation see:
 
 - [Cloud installation](setup-cloud.md)
 - [Local installation](setup-local.md)
+
+## Other packages requirements
+
+To do this workshop, we recommend the following packages are installed. These are automatically installed on the posit cloud instance shared during the talk.
+
+```r
+library(pak)
+pak(
+  c(
+    "tidyverse",
+    "palmerpenguins",
+    "coda",
+    "bayesplot",
+    "stats",
+    "DiagrammeR"
+  )
+)
+```
