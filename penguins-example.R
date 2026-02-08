@@ -91,10 +91,17 @@ m <- model(intercept, coef_flipper_length, coef_body_mass)
 # Show the dag - there's a couple of extra things here.
 plot(m)
 
-# do MCMC - 4 chains, 1000 on each after 1000 warmuup (the default)
-draws <- mcmc(m)
+# do MCMC - 4 chains, 1000 on each after 1000 warmuup (default is 2 chains)
+draws <- mcmc(
+  m,
+  sampler = hmc(),
+  n_samples = 1000,
+  warmup = 1000,
+  chains = 4,
+  n_cores = 3
+)
 
-# visualise the MCMC traces
+# visualise the MCMC traces with {coda}
 plot(draws)
 
 # we can also use bayesplot to explore the convergence of the model
@@ -107,6 +114,9 @@ coda::gelman.diag(draws, autoburnin = FALSE, multivariate = FALSE)
 
 # look at the parameter estimates
 summary(draws)
+
+# compare to glm
+summary(non_bayesian_model)
 
 ## doing prediction
 # predict to a new dataset - first the marginal effect of body mass on the link
@@ -124,6 +134,8 @@ penguins_for_prediction <- expand_grid(
     length.out = 50
   )
 )
+
+penguins_for_prediction
 
 # predict to these data
 eta_pred <- intercept +
@@ -191,12 +203,14 @@ penguins_prediction_body_mass_conditional_summary <- penguins_prediction_body_ma
     probability_female_lower = quantile(probability_female, 0.025),
   )
 
-penguins_prediction_body_mass_conditional_summary |>
-  ggplot(
-    aes(
-      x = body_mass_g_scaled
-    )
-  ) +
+penguins_prediction_body_mass_conditional_summary
+
+ggplot(
+  penguins_prediction_body_mass_conditional_summary,
+  aes(
+    x = body_mass_g_scaled
+  )
+) +
   geom_line(
     aes(
       x = body_mass_g_scaled,
