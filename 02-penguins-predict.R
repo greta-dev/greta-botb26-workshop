@@ -1,5 +1,5 @@
 # this will rerun the previous step
-source("penguins-mcmc.R")
+source("01-penguins-mcmc.R")
 source("R/penguins_add_simulation.R")
 # predict to a new dataset - first the marginal effect of body mass on the link
 # scale

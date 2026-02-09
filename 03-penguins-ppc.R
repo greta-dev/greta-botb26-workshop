@@ -1,5 +1,5 @@
 # Note that this will also run penguins-mcmc.R!
-source("penguins-predict.R")
+source("02-penguins-predict.R")
 
 ## Posterior predictive check
 
